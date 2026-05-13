@@ -1,0 +1,254 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header  */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  font-size: 32px;
+  animation: rotate 6s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.logo h1 {
+  font-size: 28px;
+  font-weight: bold;
+  letter-spacing: -1px;
+}
+
+/* Buttons  */
+button {
+  cursor: pointer;
+  border: none;
+  color: black;
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3);
+}
+
+/* Hero Section  */
+
+.hero {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.hero h2 {
+  font-size: 42px;
+  margin-bottom: 16px;
+  background: linear-gradient(90deg, #38bdf8, #a5b4fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  font-size: 20px;
+  color: #94a3b8;
+  max-width: 500px;
+  margin: 0 auto 30px;
+}
+
+.start-btn {
+  background: linear-gradient(90deg, #38bdf8, #22d3ee);
+  color: black;
+  padding: 18px 50px;
+  font-weight: 700;
+}
+
+/* Card  */
+
+.card {
+  background-color: #1e2937;
+  border-radius: 20px;
+  padding: 40px;
+  margin-bottom: 10px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Question  */
+#questions-container {
+  margin: 35px;
+}
+
+.question {
+  margin-bottom: 30px;
+}
+
+.question label {
+  display: block;
+  margin-bottom: 15px;
+  font-size: 19px;
+  color: #cbd5e1;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.option-btn {
+  padding: 16px 28px;
+  background-color: #334155;
+  color: white;
+  border: 2px solid #475569;
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.option-btn:hover {
+    border-color: #38bdf8;
+    background-color: #475569;
+}
+
+.option-btn.active {
+  background-color: #38bdf8;
+  color: black;
+  border-color: #38bdf8;
+  transform: scale(1.05);
+}
+
+/* Result Card  */
+
+.result-card {
+  background: linear-gradient(135deg, #1e2937, #334155);
+  border-radius: 28px;
+  padding: 60px 40px;
+  text-align: center;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+.emoji {
+  font-size: 80px;
+  margin-bottom: 20px;
+  animation: bounce 2s ease;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.result-card,
+h2 {
+  font-size: 38px;
+  margin-bottom: 20px;
+}
+
+.result-card .confidence {
+ background-color: #1e2937;
+    padding: 12px 30px;
+    border-radius: 50px;
+    display: inline-block;
+    margin: 20px 0 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border: 1px solid #38bdf8;
+}
+
+.result-section {
+  text-align: left;
+  margin: 25px 0;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+}
+
+.result-section h4 {
+  color: #38bdf8;
+  margin-bottom: 8px;
+}
+
+/* Result Button  */
+.result-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 40px;
+}
+
+.save-btn {
+  background-color: #38bdf8;
+  color: black;
+  padding: 16px;
+  flex: 1;
+}
+
+.new-btn {
+  background-color: #475569;
+  color: white;
+  padding: 16px;
+  flex: 1;
+}
+
+/* History  */
+
+#history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.history-item {
+  background-color: #1e2937;
+  padding: 22px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s;
+}
+
+.history-item:hover {
+    transform: translateX(10px);
+    background-color: #334155;
+}
+
+
+/* Utility Classes   */
+
+.hidden {
+  display: none !important;
+}
