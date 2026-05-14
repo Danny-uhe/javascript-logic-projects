@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- PWA Support -->
+<meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="manifest.json">
     <title>Life Logic - Decision Engine</title>
     <link rel="stylesheet" href="./css/style.css" />
     <!-- Font Awesome for icons -->
@@ -17,9 +20,16 @@
 
       <header>
         <div class="logo">
-             <span class="logo-icon"><img src="./LOGO.png" height="100" width="100" alt=""></span>
+             <span class="logo-icon"><img src="./assets/LOGO.png" height="100" width="100" alt=""></span>
         <h1>Life Logic</h1>
         </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button onclick="toggleTheme()" id="theme-toggle" class="history-btn">
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
+
         <button onclick="toggleHistory()" class="history-btn">
             <i class="fas fa-history"></i> History
         </button>
@@ -35,14 +45,33 @@
         </div>
 
         <!-- Question Screen  -->
-         <div id="questions-screen" class="hidden">
+         <!-- <div id="questions-screen" class="hidden">
             <div class="card">
                 <h3><i class="fas fa-question-circle"></i> Answer these Questions</h3>
+    
+                <div class="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+
                 <div id="question-container"></div>
                 <button onclick="analyzeDecision()" class="analyze-btn">ANALYZE DECISION</button>
             </div>
          </div>
-
+        
+</div> -->
+<!-- Questions Screen -->
+<div id="questions-screen" class="hidden">
+    <div class="card">
+        <h3><i class="fas fa-question-circle"></i> Answer These Questions</h3>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        
+        <div id="questions-container"></div>
+        
+        <button onclick="analyzeDecision()" class="analyze-btn">ANALYZE DECISION</button>
+    </div>
+</div>
             <!-- Result Screen  -->
              <div id="result-screen" class="hidden">
                 <div class="result-card">

@@ -123,32 +123,70 @@ function startDecision() {
   renderQuestions();
 }
 
+// function renderQuestions() {
+//   const container = document.getElementById("question-container");
+//   container.innerHTML = "";
+
+//   questions.forEach((question) => {
+//     let html = `<div class="question">
+//                 <label>${question.text}</label>
+//                 <div class="options">`;
+
+//     question.options.forEach((option) => {
+//       const isActive = currentAnswers[question.id] === option ? "active" : "";
+//       html += `
+//                     <button onclick="selectAnswer('${question.id}', '${option}')"
+//                     class="option-btn ${isActive}">
+//                     ${option}
+//                     </button>
+//                     `;
+//     });
+//     html += `</div></div>`;
+//     container.innerHTML += html;
+//   });
+//   updateProgressBar();
+// }
+
 function renderQuestions() {
-  const container = document.getElementById("question-container");
+  const container = document.getElementById("questions-container");
   container.innerHTML = "";
 
-  questions.forEach((question) => {
-    let html = `<div class="question">
-                <label>${question.text}</label>
-                <div class="options">`;
-
-    question.options.forEach((option) => {
-      const isActive = currentAnswers[question.id] === option ? "active" : "";
-      html += `
-                    <button onclick="selectAnswer('${question.id}', '${option}')"
-                    class="option-btn ${isActive}">
-                    ${option}
+  questions.forEach((q) => {
+    let html = `
+            <div class="question">
+                <div class="question-header">
+                    <label>${q.text}</label>
+                    <button onclick="startVoiceInput('${q.id}', this)" class="voice-btn">
+                        <i class="fas fa-microphone"></i>
                     </button>
-                    `;
+                </div>
+                <div class="options">
+        `;
+
+    q.options.forEach((option) => {
+      const isActive = currentAnswers[q.id] === option ? "active" : "";
+      html += `
+                <button onclick="selectAnswer('${q.id}', '${option}')" 
+                        class="option-btn ${isActive}">${option}</button>
+            `;
     });
+
     html += `</div></div>`;
     container.innerHTML += html;
   });
+
+  updateProgressBar();
 }
 
 function selectAnswer(id, value) {
   currentAnswers[id] = value;
   renderQuestions(); //Refresh to show active button
+}
+
+function updateProgressBar() {
+  const answered = Object.keys(currentAnswers).length;
+  const progress = (answered / questions.length) * 100;
+  document.getElementById("progress-bar").style.width = `${progress}%`;
 }
 
 function showResult() {
@@ -284,22 +322,119 @@ function exportHistory() {
     text += `   Reason: ${item.explanation}\n`;
     text += `   Advice: ${item.advice}\n\n`;
   });
+
+  // Create downloadable file
+  const blob = new Blob([text], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `life-logic-history-${new Date().toISOString().slice(0, 10)}.text`;
+  a.click();
+  alert("✅ History exported successfully!");
 }
 
-// Create downloadable file 
-const blob = new Blob([text], { type: 'text/plain' });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url;
-a.download = `life-logic-history-${new Date().toISOString().slice(0,10)}.text`;
-a.click();
-alert("✅ History exported successfully!");
+function toggleTheme() {
+  document.body.classList.toggle("light");
+
+  const icon = document.getElementById("theme-toggle");
+  if (document.body.classList.contains("light")) {
+    icon.innerHTML = '<i class="fas fa-sun"></i>';
+    localStorage.setItem("theme", "light");
+  } else {
+    icon.innerHTML = '<i class="fas fa-moon"></i>';
+    localStorage.setItem("theme", "dark");
+  }
+}
+
+// Load saved theme on page load
+function loadTheme() {
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "light") {
+    document.body.classList.add("light");
+    document.getElementById("theme-toggle").innerHTML =
+      '<i class="fas fa-sun"></i>';
+  }
+}
+
+//Voice Input Surport
+let recognition = null;
+
+function startVoiceInput(questionId, buttonElement) {
+  if (!("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
+    alert(
+      "voice input is not supported in your browser. please use chrome or Edge.",
+    );
+    return;
+  }
+
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = "en-US";
+
+  //Visual feedback for active voice input
+  buttonElement.classList.add("listening....");
+  buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  recognition.onresult = (event) => {
+    const SpokenText = event.results[0][0].transcript.toLowerCase().trim();
+    console.log("You said:", SpokenText);
+
+    const question = questions.find((q) => q.id === questionId);
+    let matched = false;
+
+    question.options.forEach((option) => {
+      if (SpokenText.includes(option.toLowerCase())) {
+        selectAnswer(questionId, option);
+        matched = true;
+      }
+    });
+
+    if (!matched) {
+      // Try fuzzy matching
+      if (spokenText.includes("yes")) selectAnswer(questionId, "Yes");
+      else if (spokenText.includes("no")) selectAnswer(questionId, "No");
+      else if (spokenText.includes("busy")) selectAnswer(questionId, "Busy");
+      else if (spokenText.includes("tired")) selectAnswer(questionId, "Tired");
+      else if (spokenText.includes("happy")) selectAnswer(questionId, "Happy");
+      else if (spokenText.includes("rain")) selectAnswer(questionId, "Rainy");
+      else {
+        alert(
+          `I heard: "${spokenText}"\n\nPlease try again or select manually.`,
+        );
+      }
+    }
+
+    //Reset button
+    buttonElement.classList.remove("listening");
+    buttonElement.innerHTML = '<i class="fas fa-microphone"></i>';
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Voice recognition error:", event);
+    buttonElement.classList.remove("listening");
+    buttonElement.innerHTML = '<i class="fas fa-microphone"></i>';
+    alert(
+      "Voice recognition failed. Please check your microphone permissions.",
+    );
+  };
+
+  recognition.onend = () => {
+    buttonElement.classList.remove("listening");
+    buttonElement.innerHTML = '<i class="fas fa-microphone"></i>';
+  };
+
+  recognition.start();
+}
 
 // initialize App
 window.onload = function () {
   loadFromLocalStorage();
+  loadTheme();
   console.log(
     "%cLife Logic Decision App Started Successfully!",
-    "color: #38bdf8; font-size: 14px",
+    "color: #38bdf8; font-size: 16px font-weight: bold;",
   );
 };
