@@ -40,45 +40,76 @@ const questions = [
   { id: "priority", text: "Important work tomorrow?", options: ["Yes", "No"] },
 ];
 
-// ================== LOGIC ==================
+// ================== DECISION ENGINE  ==================
 
 function analyzeDecision() {
   let score = 0;
+  let reasons = [];
+  //====================Scoring Logic====================
+  if (currentAnswers.money === "Yes") {
+    score += 25;
+    reasons.push(" Good financial situation ");
+  } else if (currentAnswers.money === "A little") score += 10;
 
-  if (currentAnswers.money === "Yes") score += 25;
-  if (currentAnswers.time === "Yes") score += 25;
-  if (currentAnswers.mood === "Happy" || currentAnswers.mood === "Motivated")
+  if (currentAnswers.time === "Yes") {
+    score += 25;
+    reasons.push(" You have free time ");
+  } else if (currentAnswers.time === "Busy") score += 10;
+
+  if (currentAnswers.mood === "Happy" || currentAnswers.mood === "Motivated") {
     score += 20;
-  if (currentAnswers.wheather === "Good") score += 15;
-  if (currentAnswers.priority === "No") score += 15;
+    reasons.push("Positive mood");
+  } else if (
+    currentAnswers.mood === "Stressed" ||
+    currentAnswers.mood === "Low energy"
+  );
+  score += 20;
+  if (currentAnswers.whether === "Good") {
+    score += 15;
+    reasons.push("Good weather");
+  } else if (currentAnswers.priority === "No") score += 15;
 
-  let decisionText, emoji, explanation, advice;
-  if (score >= 70) {
-    decisionText = "You should go out";
+  //==========Final Decision Logic================
+  let decisionText,
+    emoji,
+    explanation,
+    advice,
+    warning = "";
+
+  if (score >= 75) {
+    decisionText = "You Should Go Out";
     emoji = "🎉";
-    explanation =
-      "Conditions look good. You have money, time and positive mood.";
-    advice = "Enjoy your day and take action!";
-  } else if (score >= 45) {
+    explanation = "Excellent conditions! Everything aligns in your favor.";
+    advice = "Make the most of today. Take bold action.";
+  } else if (score >= 55) {
     decisionText = " proceed with caution";
-    emoji = "⚠️";
+    emoji = "⚖️";
     explanation =
       "Some factors are favorable, but there are also some challenges.";
     advice = "Consider the risks and benefits before deciding.";
+    warning = " Watch your energy and budget.";
   } else {
     decisionText = "Stay Home today";
     emoji = "🏠";
     explanation =
       "Conditions are not ideal. You may be low on money, time or energy.";
     advice = "Focus on self-care and rest today.";
+    warning = " Avoid unnecessary expenses or stress.";
   }
 
   currentDecision = {
-    date: new Date().toLocaleDateString("en-AFRICA", { weekday: "long" }),
+    date: new Date().toLocaleDateString("en-AFRICA", {
+      weekday: "long",
+      month: "short",
+      day: "numeric",
+    }),
     decision: decisionText,
     emoji: emoji,
+    confidence: Math.min(98, Math.max(45, score + 35)),
     explanation: explanation,
     advice: advice,
+    warning: warning,
+    timestamp: Date.now(),
   };
   showResult();
 }
@@ -132,6 +163,15 @@ function showResult() {
   document.getElementById("explanation").textContent =
     currentDecision.explanation;
   document.getElementById("advice").textContent = currentDecision.advice;
+
+  // Warning (if any)
+  const warningEl = document.getElementById("warning");
+  if (warningEl && currentDecision && currentDecision.warning) {
+    warningEl.textContent = currentDecision.warning;
+    warningEl.style.display = "block";
+  } else if (warningEl) {
+    warningEl.style.display = "none";
+  }
 }
 
 function saveCurrentDecision() {
@@ -145,7 +185,6 @@ function newDecision() {
   document.getElementById("result-screen").classList.add("hidden");
   document.getElementById("main-screen").classList.remove("hidden");
 }
-
 
 function toggleHistory() {
   const panel = document.getElementById("history-panel");
@@ -207,12 +246,12 @@ function toggleHistory() {
 
 // Save history to browser storage on page unload
 function saveToLocalStorage() {
-  localStorage.setItem('lifeLogicHistory', JSON.stringify(decisionHistory));
+  localStorage.setItem("lifeLogicHistory", JSON.stringify(decisionHistory));
 }
 
 // Load history from browser storage on page load
 function loadFromLocalStorage() {
-  const saved = localStorage.getItem('lifeLogicHistory');
+  const saved = localStorage.getItem("lifeLogicHistory");
   if (saved) {
     decisionHistory = JSON.parse(saved);
   }
@@ -221,16 +260,46 @@ function loadFromLocalStorage() {
 //update toggleHistory to load data
 
 function toggleHistory() {
-  const panel = document.getElementById('history-panel');
-  panel.classList.toggle('hidden');
+  const panel = document.getElementById("history-panel");
+  panel.classList.toggle("hidden");
 
-  if (!panel.classList.contains('hidden')) {
+  if (!panel.classList.contains("hidden")) {
     renderHistory();
   }
 }
 
-// initialize App
-window.onload = function() {
-  loadFromLocalStorage();
-  console.log("%cLife Logic Decision App Started Successfully!", "color: #38bdf8; font-size: 14px");
+//Export history as text file
+function exportHistory() {
+  if (decisionHistory.length === 0) {
+    alert("No history to export!");
+    return;
+  }
+
+  let text = "=== LIFE LOGIC DECISION HISTORY ==\n\n";
+
+  decisionHistory.forEach((item, index) => {
+    const date = new Date(item.timestamp);
+    text += `${index + 1}. ${item.date} - ${item.decision}\n`;
+    text += `   Confidence: ${item.confidence}\n`;
+    text += `   Reason: ${item.explanation}\n`;
+    text += `   Advice: ${item.advice}\n\n`;
+  });
 }
+
+// Create downloadable file 
+const blob = new Blob([text], { type: 'text/plain' });
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = `life-logic-history-${new Date().toISOString().slice(0,10)}.text`;
+a.click();
+alert("✅ History exported successfully!");
+
+// initialize App
+window.onload = function () {
+  loadFromLocalStorage();
+  console.log(
+    "%cLife Logic Decision App Started Successfully!",
+    "color: #38bdf8; font-size: 14px",
+  );
+};

@@ -60,7 +60,7 @@
                         <p id="advice"></p>
                     
                     </div>
-
+                    <div id="warning" class="warning"></div>
                     <div class="result-actions">
                         <button onclick="saveCurrentDecision()" class="save-btn">Save to history</button>
                         <button onclick="newDecision()" class="new-btn">New Decision</button>
@@ -70,7 +70,12 @@
 
                 <!-- History panel  -->
                  <div id="history-panel" class="hiden">
-                    <h3>Decision History</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                      <h3>Decision History</h3>
+                    <button onclick="exportHistory()" class="export-btn">
+                        <i class="fas fa-download"></i> Export as text
+                    </button>
+                    </div>
                     <div id="history-list"></div>
                  </div>
        </div>
